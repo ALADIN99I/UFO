@@ -5,14 +5,15 @@ except ImportError:
     from . import mock_metatrader5 as mt5
 
 class MT5DataCollector:
-    def __init__(self, login, password, server):
-        self.login = login
+    def __init__(self, login, password, server, path):
+        self.login = int(login)
         self.password = password
         self.server = server
+        self.path = path
 
     def connect(self):
         """Connects to the MetaTrader 5 terminal."""
-        if not mt5.initialize(login=self.login, password=self.password, server=self.server):
+        if not mt5.initialize(path=self.path, login=self.login, password=self.password, server=self.server):
             print(f"Failed to initialize MT5: {mt5.last_error()}")
             return False
         print("MT5 initialized successfully.")
