@@ -4,6 +4,7 @@ try:
     import MetaTrader5 as mt5
 except ImportError:
     from . import mock_metatrader5 as mt5
+from .data_collector import MT5DataCollector
 from .agents.data_analyst_agent import DataAnalystAgent
 from .agents.market_researcher_agent import MarketResearcherAgent
 from .agents.trader_agent import TraderAgent
