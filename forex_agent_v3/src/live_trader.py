@@ -27,7 +27,7 @@ class LiveTrader:
         )
 
         self.agents = {
-            "data_analyst": DataAnalystAgent("DataAnalyst", mt5_collector, config['finnhub']),
+            "data_analyst": DataAnalystAgent("DataAnalyst", mt5_collector, config['fmp']['api_key']),
             "researcher": MarketResearcherAgent("MarketResearcher", self.llm_client),
             "trader": TraderAgent("Trader", self.llm_client, mt5_collector),
             "risk_manager": RiskManagerAgent("RiskManager", self.llm_client, mt5_collector),
