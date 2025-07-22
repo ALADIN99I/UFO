@@ -11,7 +11,7 @@ class PortfolioManager:
 
     def get_account_info(self):
         """Gets the account information."""
-        return self.mt5.account_info()
+        return mt5.account_info()
 
     def get_positions(self):
         """Gets all open positions."""

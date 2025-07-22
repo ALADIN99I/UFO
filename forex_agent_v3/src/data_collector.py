@@ -81,6 +81,13 @@ class FinnhubDataCollector:
             self.cache = pd.DataFrame(economic_calendar.get('economicCalendar', []))
             self.last_cache_time = current_time
             return self.cache
+        except finnhub.FinnhubAPIException as e:
+            if e.status_code == 403:
+                print("Finnhub API key does not have access to the economic calendar. Continuing without economic data.")
+                return pd.DataFrame()
+            else:
+                print(f"Error fetching economic calendar from Finnhub: {e}")
+                return pd.DataFrame()
         except Exception as e:
-            print(f"Error fetching economic calendar from Finnhub: {e}")
+            print(f"An unexpected error occurred while fetching from Finnhub: {e}")
             return pd.DataFrame()
