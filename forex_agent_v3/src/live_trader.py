@@ -37,41 +37,46 @@ class LiveTrader:
         self.communication_bus = CommunicationBus()
         self.ufo_calculator = UfoCalculator(config['trading']['currencies'].split(','))
 
-    def run_single_cycle(self):
+    def run(self):
         """
-        Runs a single cycle of the live trading loop for testing.
+        Runs the live trading loop.
         """
-        # 1. Data Collection
-        # In a real scenario, you'd fetch data for all 28 crosses.
-        # For this simulation, we'll use a single symbol.
-        price_data = self.agents['data_analyst'].execute({
-            'source': 'mt5',
-            'symbol': 'EURUSD',
-            'timeframe': mt5.TIMEFRAME_M5,
-            'num_bars': 100
-        })
+        while True:
+            # 1. Data Collection
+            # In a real scenario, you'd fetch data for all 28 crosses.
+            # For this simulation, we'll use a single symbol.
+            price_data = self.agents['data_analyst'].execute({
+                'source': 'mt5',
+                'symbol': 'EURUSD',
+                'timeframe': mt5.TIMEFRAME_M5,
+                'num_bars': 100
+            })
 
-        if price_data is None:
-            print("Could not fetch price data.")
-            return
+            if price_data is None:
+                print("Could not fetch price data. Retrying in 60 seconds...")
+                time.sleep(60)
+                continue
 
-        # 2. UFO Calculation
-        variation_data = self.ufo_calculator.calculate_percentage_variation(price_data)
-        incremental_sums = self.ufo_calculator.calculate_incremental_sum(variation_data)
-        ufo_data = self.ufo_calculator.generate_ufo_data(incremental_sums)
+            # 2. UFO Calculation
+            variation_data = self.ufo_calculator.calculate_percentage_variation(price_data)
+            incremental_sums = self.ufo_calculator.calculate_incremental_sum(variation_data)
+            ufo_data = self.ufo_calculator.generate_ufo_data(incremental_sums)
 
-        # 3. Agentic Workflow
-        economic_events = self.agents['data_analyst'].execute({'source': 'fmp'})
-        research_result = self.agents['researcher'].execute(ufo_data, economic_events)
-        trade_decision = self.agents['trader'].execute(research_result['consensus'])
+            # 3. Agentic Workflow
+            # economic_events = self.agents['data_analyst'].execute({'source': 'fmp'})
+            research_result = self.agents['researcher'].execute(ufo_data, None)
+            trade_decision = self.agents['trader'].execute(research_result['consensus'])
 
-        risk_assessment = self.agents['risk_manager'].execute(trade_decision)
-        authorization = self.agents['fund_manager'].execute(trade_decision, risk_assessment)
+            risk_assessment = self.agents['risk_manager'].execute(trade_decision)
+            authorization = self.agents['fund_manager'].execute(trade_decision, risk_assessment)
 
-        # 4. Output
-        print("\n--- Live Trading Cycle ---")
-        print(f"Timestamp: {pd.Timestamp.now()}")
-        print(f"Research Consensus: {research_result['consensus']}")
-        print(f"Trade Decision: {trade_decision}")
-        print(f"Risk Assessment: {risk_assessment}")
-        print(f"Final Authorization: {authorization}")
+            # 4. Output
+            print("\n--- Live Trading Cycle ---")
+            print(f"Timestamp: {pd.Timestamp.now()}")
+            print(f"Research Consensus: {research_result['consensus']}")
+            print(f"Trade Decision: {trade_decision}")
+            print(f"Risk Assessment: {risk_assessment}")
+            print(f"Final Authorization: {authorization}")
+
+            print("\nWaiting for the next trading cycle (5 minutes)...")
+            time.sleep(300) # Wait for 5 minutes

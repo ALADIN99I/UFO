@@ -1,7 +1,7 @@
 from .base_agent import Agent
 
 class MarketResearcherAgent(Agent):
-    def execute(self, ufo_data, economic_events):
+    def execute(self, ufo_data, economic_events=None):
         """
         Analyzes the UFO data and economic events from bullish and bearish perspectives using the LLM.
         """
@@ -10,18 +10,16 @@ class MarketResearcherAgent(Agent):
 
         bullish_prompt = (
             f"You are a bullish Forex market analyst. Given the following UFO data, which shows "
-            f"{strongest_currency} as the strongest currency, and the upcoming economic events, "
-            f"provide a detailed bullish analysis. Focus on the potential for {strongest_currency} "
-            f"to continue its rally.\n\nUFO Data:\n{ufo_data.tail().to_string()}\n\n"
-            f"Economic Events:\n{economic_events.to_string()}"
+            f"{strongest_currency} as the strongest currency, provide a detailed bullish analysis. "
+            f"Focus on the potential for {strongest_currency} to continue its rally.\n\n"
+            f"UFO Data:\n{ufo_data.tail().to_string()}"
         )
 
         bearish_prompt = (
             f"You are a bearish Forex market analyst. Given the following UFO data, which shows "
-            f"{weakest_currency} as the weakest currency, and the upcoming economic events, "
-            f"provide a detailed bearish analysis. Focus on the potential for {weakest_currency} "
-            f"to continue its decline.\n\nUFO Data:\n{ufo_data.tail().to_string()}\n\n"
-            f"Economic Events:\n{economic_events.to_string()}"
+            f"{weakest_currency} as the weakest currency, provide a detailed bearish analysis. "
+            f"Focus on the potential for {weakest_currency} to continue its decline.\n\n"
+            f"UFO Data:\n{ufo_data.tail().to_string()}"
         )
 
         bullish_perspective = self.llm_client.generate_response(bullish_prompt)

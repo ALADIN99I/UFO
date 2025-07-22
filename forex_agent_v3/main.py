@@ -6,7 +6,7 @@ def main():
     config.read('config/config.ini')
 
     live_trader = LiveTrader(config)
-    live_trader.run_single_cycle()
+    live_trader.run()
 
 if __name__ == "__main__":
     main()

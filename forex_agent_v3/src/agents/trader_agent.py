@@ -42,11 +42,10 @@ class TraderAgent(Agent):
                     "tp": tick.ask + 0.002,
                     "comment": "LLM_trade"
                 }
-                # For now, we will not execute the trade automatically.
-                # This can be enabled once the system is fully tested.
-                # trade_result = self.trade_executor.execute_trade(**trade_params)
+                trade_result = self.trade_executor.execute_trade(**trade_params)
+                return trade_result
 
-        return trade_decision_str
+        return None
         # This can be enabled once the system is fully tested.
         # trade_result = self.trade_executor.execute_trade(**trade_params)
 
