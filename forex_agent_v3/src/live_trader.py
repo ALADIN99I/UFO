@@ -85,14 +85,21 @@ class LiveTrader:
                 try:
                     parsed_data = {}
 
-                    match_pair = re.search(r"Currency Pair:\s*([A-Z]{3}/[A-Z]{3})", trade_decision_str)
+                    print(f"LLM Raw Output for Parsing:\n{trade_decision_str}")
+
+                    match_pair = re.search(r"Currency Pair:\s*([A-Z]{3}/[A-Z]{3})", trade_decision_str, re.IGNORECASE)
+                    if not match_pair:
+                        match_pair = re.search(r"([A-Z]{3}/[A-Z]{3})", trade_decision_str, re.IGNORECASE)
+
                     if match_pair:
                         parsed_data['symbol'] = match_pair.group(1).replace("/", "")
                     else:
                         print("Could not parse currency pair from LLM decision. Skipping trade execution.")
                         continue
 
-                    match_direction = re.search(r"Trade Direction:\s*(Short|Sell|Buy|Long)", trade_decision_str, re.IGNORECASE)
+                    match_direction = re.search(r"Direction:\s*(Short|Sell|Buy|Long)", trade_decision_str, re.IGNORECASE)
+                    if not match_direction:
+                        match_direction = re.search(r"(Short|Sell|Buy|Long)", trade_decision_str, re.IGNORECASE)
                     if match_direction:
                         parsed_data['direction'] = match_direction.group(1).upper()
                     else:
