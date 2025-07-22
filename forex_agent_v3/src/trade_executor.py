@@ -5,7 +5,7 @@ except ImportError:
 
 class TradeExecutor:
     def __init__(self, mt5_connection):
-        self.mt5 = mt5_connection
+        self.mt5_connection = mt5_connection
 
     def execute_trade(self, symbol, trade_type, volume, price, sl, tp, comment=""):
         """
@@ -26,7 +26,7 @@ class TradeExecutor:
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
 
-        result = self.mt5.order_send(request)
+        result = mt5.order_send(request)
 
         if result.retcode != mt5.TRADE_RETCODE_DONE:
             print(f"Order send failed, retcode={result.retcode}")
