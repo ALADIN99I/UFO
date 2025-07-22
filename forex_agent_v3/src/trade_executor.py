@@ -22,7 +22,7 @@ class TradeExecutor:
             "price": price,
             "sl": sl,
             "tp": tp,
-            "deviation": 20,
+            "deviation": 50,
             "magic": 234000,
             "comment": comment,
             "type_time": mt5.ORDER_TIME_GTC,
