@@ -6,10 +6,12 @@ class FundManagerAgent(Agent):
         Gives final authorization for a trade using the LLM.
         """
         prompt = (
-            f"Given the following trade decision and risk assessment, provide a final "
-            f"authorization (approved/rejected) and a brief justification:\n\n"
-            f"Trade Decision: {trade_decision}\n"
-            f"Risk Assessment: {risk_assessment}"
+            "You are the Fund Manager. Based on the provided trade plan and risk assessment, "
+            "make a final decision to 'APPROVE' or 'REJECT' the trade. Provide a concise "
+            "justification for your decision, considering the overall portfolio strategy "
+            "and risk appetite.\n\n"
+            f"Trade Plan:\n{trade_decision}\n\n"
+            f"Risk Assessment:\n{risk_assessment}"
         )
 
         authorization = self.llm_client.generate_response(prompt)
