@@ -63,8 +63,8 @@ class LiveTrader:
             ufo_data = self.ufo_calculator.generate_ufo_data(incremental_sums)
 
             # 3. Agentic Workflow
-            # economic_events = self.agents['data_analyst'].execute({'source': 'fmp'})
-            research_result = self.agents['researcher'].execute(ufo_data, None)
+            economic_events = self.agents['data_analyst'].execute({'source': 'economic_calendar'})
+            research_result = self.agents['researcher'].execute(ufo_data, economic_events)
             trade_decision = self.agents['trader'].execute(research_result['consensus'])
 
             risk_assessment = self.agents['risk_manager'].execute(trade_decision)

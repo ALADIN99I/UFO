@@ -95,26 +95,19 @@ class FinnhubDataCollector:
 import requests
 import datetime
 
-class FMPDataCollector:
-    def __init__(self, api_key):
-        self.api_key = api_key
-        self.base_url = "https://financialmodelingprep.com/api/v3"
+class EconomicCalendarCollector:
+    def __init__(self):
+        self.url = "https://nfs.faireconomy.media/ff_calendar_thisweek.json"
 
-    def get_economic_calendar(self, start_date, end_date):
-        """Fetches economic calendar events from Financial Modeling Prep."""
-        endpoint = f"{self.base_url}/economic-calendar"
-        params = {
-            "from": start_date.strftime("%Y-%m-%d"),
-            "to": end_date.strftime("%Y-%m-%d"),
-            "apikey": self.api_key
-        }
+    def get_economic_calendar(self):
+        """Fetches economic calendar events from the specified URL."""
         try:
-            response = requests.get(endpoint, params=params)
+            response = requests.get(self.url)
             response.raise_for_status()
             return pd.DataFrame(response.json())
         except requests.exceptions.RequestException as e:
-            print(f"Error fetching economic calendar from FMP: {e}")
+            print(f"Error fetching economic calendar: {e}")
             return pd.DataFrame()
         except ValueError as e:
-            print(f"Error parsing JSON response from FMP: {e}")
+            print(f"Error parsing JSON response: {e}")
             return pd.DataFrame()
