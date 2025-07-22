@@ -65,10 +65,7 @@ class LiveTrader:
         research_result = self.agents['researcher'].execute(ufo_data, economic_events)
         trade_decision = self.agents['trader'].execute(research_result['consensus'])
 
-        # For live trading, we'd need a way to get the real-time equity curve.
-        # Here, we'll use a placeholder.
-        dummy_equity_curve = pd.Series([0, 1, 2, 1, 3])
-        risk_assessment = self.agents['risk_manager'].execute(trade_decision, dummy_equity_curve)
+        risk_assessment = self.agents['risk_manager'].execute(trade_decision)
         authorization = self.agents['fund_manager'].execute(trade_decision, risk_assessment)
 
         # 4. Output

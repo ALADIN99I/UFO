@@ -75,8 +75,10 @@ class FinnhubDataCollector:
 
         print("Fetching fresh economic calendar data from Finnhub.")
         try:
-            economic_calendar = self.client.calendar_events()
-            self.cache = pd.DataFrame(economic_calendar.get('calendarEvents', []))
+            # The economic_calendar method has been deprecated.
+            # We will use the generic _get method to access the endpoint.
+            economic_calendar = self.client._get("/calendar/economic")
+            self.cache = pd.DataFrame(economic_calendar.get('economicCalendar', []))
             self.last_cache_time = current_time
             return self.cache
         except Exception as e:
