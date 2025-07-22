@@ -11,6 +11,9 @@ class TradeExecutor:
         """
         Executes a trade on the MT5 terminal.
         """
+        if not self.mt5_connection.connect():
+            return None
+
         request = {
             "action": mt5.TRADE_ACTION_DEAL,
             "symbol": symbol,
@@ -33,6 +36,7 @@ class TradeExecutor:
             return None
 
         print(f"Order sent successfully, order ticket: {result.order}")
+        self.mt5_connection.disconnect()
         return result
 
     def close_trade(self, ticket):
