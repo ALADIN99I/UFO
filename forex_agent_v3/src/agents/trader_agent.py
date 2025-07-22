@@ -30,17 +30,23 @@ class TraderAgent(Agent):
         # For this simulation, we'll print the decision and use placeholder values.
         print(f"LLM Trade Decision:\n{trade_decision_str}")
 
-        trade_params = {
-            "symbol": "EURUSD",
-            "trade_type": mt5.ORDER_TYPE_BUY,
-            "volume": 0.1,
-            "price": mt5.symbol_info_tick("EURUSD").ask,
-            "sl": mt5.symbol_info_tick("EURUSD").ask - 0.001,
-            "tp": mt5.symbol_info_tick("EURUSD").ask + 0.002,
-            "comment": "LLM_trade"
-        }
+        if self.trade_executor.mt5.connect():
+            tick = mt5.symbol_info_tick("EURUSD")
+            if tick:
+                trade_params = {
+                    "symbol": "EURUSD",
+                    "trade_type": mt5.ORDER_TYPE_BUY,
+                    "volume": 0.1,
+                    "price": tick.ask,
+                    "sl": tick.ask - 0.001,
+                    "tp": tick.ask + 0.002,
+                    "comment": "LLM_trade"
+                }
+                # For now, we will not execute the trade automatically.
+                # This can be enabled once the system is fully tested.
+                # trade_result = self.trade_executor.execute_trade(**trade_params)
 
-        # For now, we will not execute the trade automatically.
+        return trade_decision_str
         # This can be enabled once the system is fully tested.
         # trade_result = self.trade_executor.execute_trade(**trade_params)
 

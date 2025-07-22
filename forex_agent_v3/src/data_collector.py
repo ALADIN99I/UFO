@@ -75,8 +75,8 @@ class FinnhubDataCollector:
 
         print("Fetching fresh economic calendar data from Finnhub.")
         try:
-            economic_calendar = self.client.economic_calendar()
-            self.cache = pd.DataFrame(economic_calendar.get('economicCalendar', []))
+            economic_calendar = self.client.calendar_events()
+            self.cache = pd.DataFrame(economic_calendar.get('calendarEvents', []))
             self.last_cache_time = current_time
             return self.cache
         except Exception as e:
