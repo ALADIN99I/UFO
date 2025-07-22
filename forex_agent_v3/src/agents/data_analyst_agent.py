@@ -24,4 +24,4 @@ class DataAnalystAgent(Agent):
             today = datetime.date.today()
             future_date = today + datetime.timedelta(days=7)
             return self.fmp_collector.get_economic_calendar(today, future_date)
-        return "Unknown data source"
+        return pd.DataFrame()
