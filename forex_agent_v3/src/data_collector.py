@@ -91,3 +91,30 @@ class FinnhubDataCollector:
         except Exception as e:
             print(f"An unexpected error occurred while fetching from Finnhub: {e}")
             return pd.DataFrame()
+
+import requests
+import datetime
+
+class FMPDataCollector:
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.base_url = "https://financialmodelingprep.com/api/v3"
+
+    def get_economic_calendar(self, start_date, end_date):
+        """Fetches economic calendar events from Financial Modeling Prep."""
+        endpoint = f"{self.base_url}/economic-calendar"
+        params = {
+            "from": start_date.strftime("%Y-%m-%d"),
+            "to": end_date.strftime("%Y-%m-%d"),
+            "apikey": self.api_key
+        }
+        try:
+            response = requests.get(endpoint, params=params)
+            response.raise_for_status()
+            return pd.DataFrame(response.json())
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching economic calendar from FMP: {e}")
+            return pd.DataFrame()
+        except ValueError as e:
+            print(f"Error parsing JSON response from FMP: {e}")
+            return pd.DataFrame()

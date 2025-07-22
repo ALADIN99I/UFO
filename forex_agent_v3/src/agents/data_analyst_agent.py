@@ -1,11 +1,12 @@
 from .base_agent import Agent
-from ..data_collector import FinnhubDataCollector
+from ..data_collector import FMPDataCollector
+import datetime
 
 class DataAnalystAgent(Agent):
-    def __init__(self, name, mt5_collector, finnhub_config):
+    def __init__(self, name, mt5_collector, fmp_api_key):
         super().__init__(name)
         self.mt5_collector = mt5_collector
-        self.finnhub_collector = FinnhubDataCollector(**finnhub_config)
+        self.fmp_collector = FMPDataCollector(fmp_api_key)
 
     def execute(self, task):
         """
@@ -19,6 +20,8 @@ class DataAnalystAgent(Agent):
                 self.mt5_collector.disconnect()
                 return data
             return None
-        elif task['source'] == 'finnhub':
-            return self.finnhub_collector.get_economic_calendar()
+        elif task['source'] == 'fmp':
+            today = datetime.date.today()
+            future_date = today + datetime.timedelta(days=7)
+            return self.fmp_collector.get_economic_calendar(today, future_date)
         return "Unknown data source"
