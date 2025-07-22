@@ -1,10 +1,10 @@
 from .base_agent import Agent
-from ..data_collector import MT5DataCollector, FinnhubDataCollector
+from ..data_collector import FinnhubDataCollector
 
 class DataAnalystAgent(Agent):
-    def __init__(self, name, mt5_config, finnhub_config):
+    def __init__(self, name, mt5_collector, finnhub_config):
         super().__init__(name)
-        self.mt5_collector = MT5DataCollector(**mt5_config)
+        self.mt5_collector = mt5_collector
         self.finnhub_collector = FinnhubDataCollector(**finnhub_config)
 
     def execute(self, task):
