@@ -18,11 +18,18 @@ class LiveTrader:
         self.config = config
         self.llm_client = LLMClient(api_key=config['openrouter']['api_key'])
 
+        mt5_collector = MT5DataCollector(
+            login=config['mt5']['login'],
+            password=config['mt5']['password'],
+            server=config['mt5']['server'],
+            path=config['mt5']['path']
+        )
+
         self.agents = {
-            "data_analyst": DataAnalystAgent("DataAnalyst", config['mt5'], config['finnhub']),
+            "data_analyst": DataAnalystAgent("DataAnalyst", mt5_collector, config['finnhub']),
             "researcher": MarketResearcherAgent("MarketResearcher", self.llm_client),
-            "trader": TraderAgent("Trader", self.llm_client),
-            "risk_manager": RiskManagerAgent("RiskManager", self.llm_client),
+            "trader": TraderAgent("Trader", self.llm_client, mt5_collector),
+            "risk_manager": RiskManagerAgent("RiskManager", self.llm_client, mt5_collector),
             "fund_manager": FundManagerAgent("FundManager", self.llm_client)
         }
 
