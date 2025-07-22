@@ -92,7 +92,9 @@ class LiveTrader:
                         match_pair = re.search(r"([A-Z]{3}/[A-Z]{3})", trade_decision_str, re.IGNORECASE)
 
                     if match_pair:
-                        parsed_data['symbol'] = match_pair.group(1).replace("/", "")
+                        base_symbol = match_pair.group(1).replace("/", "")
+                        symbol_suffix = self.config['mt5'].get('symbol_suffix', '')
+                        parsed_data['symbol'] = base_symbol + symbol_suffix
                     else:
                         print("Could not parse currency pair from LLM decision. Skipping trade execution.")
                         continue
@@ -106,18 +108,7 @@ class LiveTrader:
                         print("Could not parse trade direction from LLM decision. Skipping trade execution.")
                         continue
 
-                    lot_size_patterns = [
-                        r"Lot Size:\s*([\d\.]+) (lots|mini lots|standard lots)",
-                        r"Position Size:\s*([\d\.]+) (lots|mini lots|standard lots)",
-                        r"Position size = \s*([\d\.]+) (lots|mini lots|standard lots)",
-                        r"Final Lot Size:\s*([\d\.]+) (lots|mini lots|standard lots)"
-                    ]
-
-                    match_lot_size = None
-                    for pattern in lot_size_patterns:
-                        match_lot_size = re.search(pattern, trade_decision_str, re.IGNORECASE)
-                        if match_lot_size:
-                            break
+                    match_lot_size = re.search(r"Lot Size:\s*\**([\d\.]+)\**\s*(lots|mini lots|standard lots).*", trade_decision_str, re.IGNORECASE)
 
                     if match_lot_size:
                         lot_value = float(match_lot_size.group(1))
