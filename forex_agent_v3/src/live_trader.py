@@ -61,7 +61,8 @@ class LiveTrader:
         ufo_data = self.ufo_calculator.generate_ufo_data(incremental_sums)
 
         # 3. Agentic Workflow
-        research_result = self.agents['researcher'].execute(ufo_data)
+        economic_events = self.agents['data_analyst'].execute({'source': 'finnhub'})
+        research_result = self.agents['researcher'].execute(ufo_data, economic_events)
         trade_decision = self.agents['trader'].execute(research_result['consensus'])
 
         # For live trading, we'd need a way to get the real-time equity curve.
