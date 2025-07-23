@@ -86,7 +86,7 @@ class LiveTrader:
                 try:
                     try:
                         # Extract the JSON part of the string
-                        json_match = re.search(r'{.*}', trade_decision_str)
+                        json_match = re.search(r'{.*}', trade_decision_str, re.DOTALL)
                         if not json_match:
                             print("No JSON object found in the LLM decision.")
                             continue
