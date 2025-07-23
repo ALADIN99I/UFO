@@ -112,7 +112,7 @@ class LiveTrader:
 
                     print(f"Attempting to parse lot size from: {trade_decision_str}")
                     regex_pattern = r"([\d\.]+)\s*(lots|mini lots|standard lots)"
-                    print(f"Using regex: {regex_pattern}")
+                    print(f"Using regex for lot size: {regex_pattern}")
                     match_lot_size = re.search(regex_pattern, trade_decision_str, re.IGNORECASE)
 
                     if match_lot_size:
@@ -130,9 +130,14 @@ class LiveTrader:
                         print("Could not parse lot size from LLM decision. Skipping trade execution.")
                         continue
 
-                    match_sl = re.search(r"Stop-Loss \(SL\):\s*([\d\.]+)", trade_decision_str)
+                    print(f"Attempting to parse SL from: {trade_decision_str}")
+                    regex_pattern = r"-\s*\*\*Stop-?\s?Loss\s?\(SL\):\*\*\s*([\d\.]+)"
+                    print(f"Using regex for SL: {regex_pattern}")
+                    match_sl = re.search(regex_pattern, trade_decision_str, re.IGNORECASE)
                     if match_sl:
+                        print(f"SL match found: {match_sl.groups()}")
                         parsed_data['sl'] = float(match_sl.group(1))
+                        print(f"Parsed SL: {parsed_data['sl']}")
                     else:
                         print("Could not parse SL from LLM decision. Skipping trade execution.")
                         continue
