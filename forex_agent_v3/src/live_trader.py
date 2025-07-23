@@ -94,6 +94,7 @@ class LiveTrader:
                     if match_pair:
                         base_symbol = match_pair.group(1).replace("/", "")
                         symbol_suffix = self.config['mt5'].get('symbol_suffix', '')
+                        print(f"Read symbol_suffix from config: '{symbol_suffix}'")
                         parsed_data['symbol'] = base_symbol + symbol_suffix
                         print(f"Appended broker suffix: {parsed_data['symbol']}")
                     else:
@@ -110,7 +111,7 @@ class LiveTrader:
                         continue
 
                     print(f"Attempting to parse lot size from: {trade_decision_str}")
-                    regex_pattern = r"(?:Position Sizing|Final Position|Lot Size|Final Lot Size):\s*\**([\d\.]+)\**\s*(lots|mini lots|standard lots).*"
+                    regex_pattern = r"([\d\.]+)\s*(lots|mini lots|standard lots)"
                     print(f"Using regex: {regex_pattern}")
                     match_lot_size = re.search(regex_pattern, trade_decision_str, re.IGNORECASE)
 
