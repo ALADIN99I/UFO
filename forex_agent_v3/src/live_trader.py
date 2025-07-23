@@ -108,7 +108,7 @@ class LiveTrader:
                         print("Could not parse trade direction from LLM decision. Skipping trade execution.")
                         continue
 
-                    match_lot_size = re.search(r"Lot Size:\s*\**([\d\.]+)\**\s*(lots|mini lots|standard lots).*", trade_decision_str, re.IGNORECASE)
+                    match_lot_size = re.search(r"(?:Final\s+)?Lot Size:\s*\**([\d\.]+)\**\s*(lots|mini lots|standard lots).*", trade_decision_str, re.IGNORECASE)
 
                     if match_lot_size:
                         lot_value = float(match_lot_size.group(1))
