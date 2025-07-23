@@ -1,6 +1,7 @@
 import time
 import pandas as pd
 import re
+import json
 try:
     import MetaTrader5 as mt5
 except ImportError:
@@ -83,79 +84,40 @@ class LiveTrader:
             # 5. Trade Execution
             if "APPROVE" in authorization.upper():
                 try:
-                    parsed_data = {}
+                    try:
+                        # Extract the JSON part of the string
+                        json_match = re.search(r'{.*}', trade_decision_str)
+                        if not json_match:
+                            print("No JSON object found in the LLM decision.")
+                            continue
 
-                    print(f"LLM Raw Output for Parsing:\n{trade_decision_str}")
+                        trade_decision_json_str = json_match.group(0)
+                        parsed_data = json.loads(trade_decision_json_str)
 
-                    match_pair = re.search(r"Currency Pair:\s*([A-Z]{3}/[A-Z]{3})", trade_decision_str, re.IGNORECASE)
-                    if not match_pair:
-                        match_pair = re.search(r"([A-Z]{3}/[A-Z]{3})", trade_decision_str, re.IGNORECASE)
+                        # Validate required fields
+                        required_keys = ['currency_pair', 'direction', 'stop_loss', 'take_profit', 'lot_size']
+                        if not all(key in parsed_data for key in required_keys):
+                            print("Missing one or more required keys in the JSON decision.")
+                            continue
 
-                    if match_pair:
-                        base_symbol = match_pair.group(1).replace("/", "")
+                        # Process and use parsed data
+                        base_symbol = parsed_data['currency_pair'].replace("/", "")
                         symbol_suffix = self.config['mt5'].get('symbol_suffix', '')
                         print(f"Read symbol_suffix from config: '{symbol_suffix}'")
-                        parsed_data['symbol'] = base_symbol + symbol_suffix
-                        print(f"Appended broker suffix: {parsed_data['symbol']}")
-                    else:
-                        print("Could not parse currency pair from LLM decision. Skipping trade execution.")
+                        symbol_to_trade = base_symbol + symbol_suffix
+                        print(f"Constructed symbol for trade: {symbol_to_trade}")
+
+                        direction_str = parsed_data['direction'].upper()
+                        lot_size = float(parsed_data['lot_size'])
+                        sl_price = float(parsed_data['stop_loss'])
+                        final_tp_price = float(parsed_data['take_profit'])
+
+                    except json.JSONDecodeError:
+                        print("Failed to decode JSON from LLM decision.")
                         continue
-
-                    match_direction = re.search(r"Direction:\s*(Short|Sell|Buy|Long)", trade_decision_str, re.IGNORECASE)
-                    if not match_direction:
-                        match_direction = re.search(r"(Short|Sell|Buy|Long)", trade_decision_str, re.IGNORECASE)
-                    if match_direction:
-                        parsed_data['direction'] = match_direction.group(1).upper()
-                    else:
-                        print("Could not parse trade direction from LLM decision. Skipping trade execution.")
+                    except KeyError as e:
+                        print(f"Missing key in JSON object: {e}")
                         continue
-
-                    print(f"Attempting to parse lot size from: {trade_decision_str}")
-                    regex_pattern = r"([\d\.]+)\s*(lots|mini lots|standard lots)"
-                    print(f"Using regex for lot size: {regex_pattern}")
-                    match_lot_size = re.search(regex_pattern, trade_decision_str, re.IGNORECASE)
-
-                    if match_lot_size:
-                        print(f"Lot size match found: {match_lot_size.groups()}")
-                        lot_value = float(match_lot_size.group(1))
-                        unit = match_lot_size.group(2).lower()
-                        if "mini" in unit:
-                            parsed_data['lot_size'] = lot_value / 10
-                        elif "micro" in unit:
-                            parsed_data['lot_size'] = lot_value / 100
-                        else:
-                            parsed_data['lot_size'] = lot_value
-                        print(f"Parsed lot size: {parsed_data['lot_size']}")
-                    else:
-                        print("Could not parse lot size from LLM decision. Skipping trade execution.")
-                        continue
-
-                    print(f"Attempting to parse SL from: {trade_decision_str}")
-                    regex_pattern = r"-\s*\*\*Stop-?\s?Loss\s?\(SL\):\*\*\s*([\d\.]+)"
-                    print(f"Using regex for SL: {regex_pattern}")
-                    match_sl = re.search(regex_pattern, trade_decision_str, re.IGNORECASE)
-                    if match_sl:
-                        print(f"SL match found: {match_sl.groups()}")
-                        parsed_data['sl'] = float(match_sl.group(1))
-                        print(f"Parsed SL: {parsed_data['sl']}")
-                    else:
-                        print("Could not parse SL from LLM decision. Skipping trade execution.")
-                        continue
-
-                    match_tp = re.search(r"TP1\s*([\d\.]+)", trade_decision_str)
-                    if not match_tp:
-                        match_tp = re.search(r"Take-Profit \(TP\):\s*([\d\.]+)", trade_decision_str)
-                    if match_tp:
-                        parsed_data['tp'] = float(match_tp.group(1))
-                    else:
-                        print("Could not parse TP from LLM decision. Skipping trade execution.")
-                        continue
-
-                    symbol_to_trade = parsed_data['symbol']
-                    direction_str = parsed_data['direction']
-                    lot_size = parsed_data['lot_size']
-                    sl_price = parsed_data['sl']
-                    final_tp_price = parsed_data['tp']
 
                     mt5_trade_type = mt5.ORDER_TYPE_SELL if "SELL" in direction_str else mt5.ORDER_TYPE_BUY
 

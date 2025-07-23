@@ -17,9 +17,10 @@ class TraderAgent(Agent):
         """
         prompt = (
             "You are a professional Forex trader. Based on the following research consensus, "
-            "formulate a precise and actionable trade plan. Specify the currency pair, "
-            "trade direction (buy/sell), entry price, stop-loss, take-profit, and lot size "
-            "for a $10,000 account with a 2% risk tolerance.\n\n"
+            "formulate a precise and actionable trade plan. Output the trade plan as a JSON object "
+            "with the following structure: "
+            "`{'currency_pair': 'EURUSD', 'direction': 'SELL', 'entry_price': 1.0800, 'stop_loss': 1.0850, 'take_profit': 1.0650, 'lot_size': 0.40}`.\n\n"
+            "The lot size should be calculated for a $10,000 account with a 2% risk tolerance.\n\n"
             f"Research Consensus:\n{research_consensus}"
         )
 
