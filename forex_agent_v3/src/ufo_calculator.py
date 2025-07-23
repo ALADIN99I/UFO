@@ -21,21 +21,22 @@ class UfoCalculator:
         """
         return variation_data.cumsum()
 
-    def generate_ufo_data(self, incremental_sums):
+    def generate_ufo_data(self, incremental_sums_dict):
         """
-        Generates the UFO market performance data.
+        Generates the UFO market performance data for multiple timeframes.
         """
-        ufo_data = pd.DataFrame(index=incremental_sums.index)
-
-        for currency in self.currencies:
-            currency_performance = pd.Series(0, index=incremental_sums.index)
-            for cross in incremental_sums.columns:
-                if currency in cross:
-                    base, quote = cross[:3], cross[3:]
-                    if currency == base:
-                        currency_performance += incremental_sums[cross]
-                    else:
-                        currency_performance -= incremental_sums[cross]
-            ufo_data[currency] = currency_performance
-
-        return ufo_data
+        ufo_data_dict = {}
+        for timeframe, incremental_sums in incremental_sums_dict.items():
+            ufo_data = pd.DataFrame(index=incremental_sums.index)
+            for currency in self.currencies:
+                currency_performance = pd.Series(0, index=incremental_sums.index)
+                for cross in incremental_sums.columns:
+                    if currency in cross:
+                        base, quote = cross[:3], cross[3:]
+                        if currency == base:
+                            currency_performance += incremental_sums[cross]
+                        else:
+                            currency_performance -= incremental_sums[cross]
+                ufo_data[currency] = currency_performance
+            ufo_data_dict[timeframe] = ufo_data
+        return ufo_data_dict

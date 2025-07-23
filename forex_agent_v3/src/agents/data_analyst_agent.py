@@ -13,10 +13,13 @@ class DataAnalystAgent(Agent):
         Executes a data collection task.
         """
         if task['source'] == 'mt5':
+            data = {}
             if self.mt5_collector.connect():
-                data = self.mt5_collector.get_historical_data(
-                    task['symbol'], task['timeframe'], task['num_bars']
-                )
+                for timeframe in task['timeframes']:
+                    df = self.mt5_collector.get_historical_data(
+                        task['symbol'], timeframe, task['num_bars']
+                    )
+                    data[timeframe] = df
                 self.mt5_collector.disconnect()
                 return data
             return None

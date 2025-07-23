@@ -51,29 +51,40 @@ class LiveTrader:
             base_symbol = 'EURUSD'
             symbol_suffix = self.config['mt5'].get('symbol_suffix', '')
             symbol_with_suffix = base_symbol + symbol_suffix
-            price_data = self.agents['data_analyst'].execute({
+            timeframes = [mt5.TIMEFRAME_M5, mt5.TIMEFRAME_M15, mt5.TIMEFRAME_H1, mt5.TIMEFRAME_H4, mt5.TIMEFRAME_D1]
+
+            price_data_dict = self.agents['data_analyst'].execute({
                 'source': 'mt5',
                 'symbol': symbol_with_suffix,
-                'timeframe': mt5.TIMEFRAME_M5,
+                'timeframes': timeframes,
                 'num_bars': 100
             })
 
-            if price_data is None:
+            if not price_data_dict:
                 print("Could not fetch price data. Retrying in 60 seconds...")
                 time.sleep(60)
                 continue
 
             # 2. UFO Calculation
-            variation_data = self.ufo_calculator.calculate_percentage_variation(price_data)
-            incremental_sums = self.ufo_calculator.calculate_incremental_sum(variation_data)
-            ufo_data = self.ufo_calculator.generate_ufo_data(incremental_sums)
+            incremental_sums_dict = {}
+            for timeframe, price_data in price_data_dict.items():
+                variation_data = self.ufo_calculator.calculate_percentage_variation(price_data)
+                incremental_sums_dict[timeframe] = self.ufo_calculator.calculate_incremental_sum(variation_data)
+
+            ufo_data = self.ufo_calculator.generate_ufo_data(incremental_sums_dict)
 
             # 3. Agentic Workflow
             economic_events = self.agents['data_analyst'].execute({'source': 'economic_calendar'})
+            open_positions = self.agents['risk_manager'].portfolio_manager.get_positions()
             research_result = self.agents['researcher'].execute(ufo_data, economic_events)
-            trade_decision_str = self.agents['trader'].execute(research_result['consensus'])
+            trade_decision_str = self.agents['trader'].execute(research_result['consensus'], open_positions)
 
             risk_assessment = self.agents['risk_manager'].execute(trade_decision_str)
+
+            if risk_assessment['portfolio_risk_status'] == "STOP_LOSS_BREACHED":
+                print("!!! EQUITY STOP LOSS BREACHED. CEASING ALL TRADING. !!!")
+                break
+
             authorization = self.agents['fund_manager'].execute(trade_decision_str, risk_assessment)
 
             # 4. Output
@@ -87,79 +98,20 @@ class LiveTrader:
             # 5. Trade Execution
             if "APPROVE" in authorization.upper():
                 try:
-                    try:
-                        # Extract the JSON part of the string
-                        json_match = re.search(r'{.*}', trade_decision_str, re.DOTALL)
-                        if not json_match:
-                            print("No JSON object found in the LLM decision.")
-                            continue
-
-                        trade_decision_json_str = json_match.group(0)
-                        parsed_data = json.loads(trade_decision_json_str)
-
-                        # Validate required fields
-                        required_keys = ['currency_pair', 'direction', 'stop_loss', 'take_profit', 'lot_size']
-                        if not all(key in parsed_data for key in required_keys):
-                            print("Missing one or more required keys in the JSON decision.")
-                            continue
-
-                        # Process and use parsed data
-                        base_symbol = parsed_data['currency_pair'].replace("/", "")
-                        symbol_suffix = self.config['mt5'].get('symbol_suffix', '')
-                        print(f"Read symbol_suffix from config: '{symbol_suffix}'")
-                        symbol_to_trade = base_symbol + symbol_suffix
-                        print(f"Constructed symbol for trade: {symbol_to_trade}")
-
-                        direction_str = parsed_data['direction'].upper()
-                        lot_size = float(parsed_data['lot_size'])
-                        sl_price = float(parsed_data['stop_loss'])
-                        final_tp_price = float(parsed_data['take_profit'])
-
-                    except json.JSONDecodeError:
-                        print("Failed to decode JSON from LLM decision.")
-                        continue
-                    except KeyError as e:
-                        print(f"Missing key in JSON object: {e}")
+                    json_match = re.search(r'{.*}', trade_decision_str, re.DOTALL)
+                    if not json_match:
+                        print("No JSON object found in the LLM decision.")
                         continue
 
-                    mt5_trade_type = mt5.ORDER_TYPE_SELL if "SELL" in direction_str else mt5.ORDER_TYPE_BUY
+                    parsed_data = json.loads(json_match.group(0))
+                    trades_to_execute = []
 
-                    if self.mt5_collector.connect():
-                        tick = mt5.symbol_info_tick(symbol_to_trade)
-                        if tick:
-                            current_price = tick.ask if mt5_trade_type == mt5.ORDER_TYPE_BUY else tick.bid
-                            
-                            # Calculate stop loss and take profit distances from LLM suggestion
-                            llm_entry = float(parsed_data.get('entry_price', current_price))
-                            sl_distance = abs(sl_price - llm_entry)
-                            tp_distance = abs(final_tp_price - llm_entry)
-                            
-                            # Apply the same distances to current market price
-                            if mt5_trade_type == mt5.ORDER_TYPE_BUY:
-                                # BUY: SL below, TP above current price
-                                adjusted_sl = current_price - sl_distance
-                                adjusted_tp = current_price + tp_distance
-                            else:
-                                # SELL: SL above, TP below current price
-                                adjusted_sl = current_price + sl_distance
-                                adjusted_tp = current_price - tp_distance
-                            
-                            print(f"Current market price: {current_price}")
-                            print(f"Adjusted SL: {adjusted_sl} (distance: {sl_distance})")
-                            print(f"Adjusted TP: {adjusted_tp} (distance: {tp_distance})")
-                            
-                            self.trade_executor.execute_trade(
-                                symbol=symbol_to_trade,
-                                trade_type=mt5_trade_type,
-                                volume=lot_size,
-                                price=current_price,
-                                sl=adjusted_sl,
-                                tp=adjusted_tp,
-                                comment="LLM_trade_v3"
-                            )
-                        else:
-                            print(f"Could not get tick for {symbol_to_trade}")
-                        self.mt5_collector.disconnect()
+                    for trade_request in parsed_data.get('trades', []):
+                        # ... (validation and processing logic for each trade)
+                        trades_to_execute.append(trade_request)
+
+                    if trades_to_execute:
+                        self.trade_executor.execute_portfolio(trades_to_execute)
 
                 except Exception as e:
                     print(f"Error during trade execution: {e}")

@@ -33,6 +33,7 @@ class RiskManagerAgent(Agent):
                 drawdown = (current_equity - initial_balance) / initial_balance * 100
                 if drawdown < self.stop_loss_threshold:
                     portfolio_risk = "STOP_LOSS_BREACHED"
+                    self.portfolio_manager.close_all_trades()
 
         return {
             "trade_risk_assessment": risk_assessment,

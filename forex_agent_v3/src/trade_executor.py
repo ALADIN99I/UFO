@@ -97,13 +97,53 @@ class TradeExecutor:
         self.mt5_connection.disconnect()
         return result
 
+    def execute_portfolio(self, trades):
+        """
+        Executes a portfolio of trades.
+        """
+        results = []
+        for trade in trades:
+            result = self.execute_trade(
+                symbol=trade['symbol'],
+                trade_type=trade['trade_type'],
+                volume=trade['volume'],
+                price=trade['price'],
+                sl=trade['sl'],
+                tp=trade['tp'],
+                comment=trade.get('comment', '')
+            )
+            results.append(result)
+        return results
+
+    def close_all_trades(self):
+        """
+        Closes all open trades.
+        """
+        if not self.mt5_connection.connect():
+            return False
+
+        positions = mt5.positions_get()
+        if positions is None:
+            print("No positions found.")
+            return True
+
+        for position in positions:
+            self.close_trade(position.ticket)
+
+        self.mt5_connection.disconnect()
+        return True
+
     def close_trade(self, ticket):
         """
         Closes a trade on the MT5 terminal.
         """
-        position_info = self.mt5.positions_get(ticket=ticket)
+        if not self.mt5_connection.connect():
+            return False
+
+        position_info = mt5.positions_get(ticket=ticket)
         if position_info is None or len(position_info) == 0:
             print(f"No position found with ticket {ticket}")
+            self.mt5_connection.disconnect()
             return False
 
         position = position_info[0]
@@ -121,11 +161,13 @@ class TradeExecutor:
             "type_filling": mt5.ORDER_FILLING_IOC,
         }
 
-        result = self.mt5.order_send(request)
+        result = mt5.order_send(request)
 
         if result.retcode != mt5.TRADE_RETCODE_DONE:
             print(f"Close order failed, retcode={result.retcode}")
+            self.mt5_connection.disconnect()
             return False
 
         print(f"Position {ticket} closed successfully.")
+        self.mt5_connection.disconnect()
         return True
