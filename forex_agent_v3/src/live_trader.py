@@ -108,7 +108,10 @@ class LiveTrader:
                         print("Could not parse trade direction from LLM decision. Skipping trade execution.")
                         continue
 
-                    match_lot_size = re.search(r"(?:Final\s+)?Lot Size:\s*\**([\d\.]+)\**\s*(lots|mini lots|standard lots).*", trade_decision_str, re.IGNORECASE)
+                    print(f"Attempting to parse lot size from: {trade_decision_str}")
+                    regex_pattern = r"(?:Final\s+)?Lot Size:\s*\**([\d\.]+)\**\s*(lots|mini lots|standard lots).*"
+                    print(f"Using regex: {regex_pattern}")
+                    match_lot_size = re.search(regex_pattern, trade_decision_str, re.IGNORECASE)
 
                     if match_lot_size:
                         print(f"Lot size match found: {match_lot_size.groups()}")
@@ -120,6 +123,7 @@ class LiveTrader:
                             parsed_data['lot_size'] = lot_value / 100
                         else:
                             parsed_data['lot_size'] = lot_value
+                        print(f"Parsed lot size: {parsed_data['lot_size']}")
                     else:
                         print("Could not parse lot size from LLM decision. Skipping trade execution.")
                         continue
