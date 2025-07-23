@@ -111,6 +111,7 @@ class LiveTrader:
                     match_lot_size = re.search(r"(?:Final\s+)?Lot Size:\s*\**([\d\.]+)\**\s*(lots|mini lots|standard lots).*", trade_decision_str, re.IGNORECASE)
 
                     if match_lot_size:
+                        print(f"Lot size match found: {match_lot_size.groups()}")
                         lot_value = float(match_lot_size.group(1))
                         unit = match_lot_size.group(2).lower()
                         if "mini" in unit:
