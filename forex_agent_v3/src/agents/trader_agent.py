@@ -16,11 +16,12 @@ class TraderAgent(Agent):
         open_positions_str = open_positions.to_string() if not open_positions.empty else "No open positions."
 
         prompt = (
-            "You are a professional Forex trader. Based on the following research consensus and "
+            "You are a professional Forex trader. Based on the following multi-timeframe research consensus and "
             "the current open positions, formulate a precise and actionable trade plan. "
-            "This may involve opening new trades, or adjusting existing ones.\n\n"
-            "The trade plan should be a list of trades in a JSON object, with each trade having the following structure: "
-            "`{'currency_pair': 'EURUSD', 'direction': 'SELL', 'entry_price': 1.0800, 'stop_loss': 1.0850, 'take_profit': 1.0650, 'lot_size': 0.40}`.\n\n"
+            "Your plan should synthesize insights from all available timeframes to ensure it reflects the 'bigger picture'. "
+            "This may involve opening new trades, reinforcing existing positions (e.g., by adding to the lot size), or closing positions.\n\n"
+            "The trade plan should be a list of actions in a JSON object, with each action having the following structure: "
+            "`{'action': 'new_trade'/'adjust_trade'/'close_trade', 'trade_id': <optional>, 'currency_pair': 'EURUSD', 'direction': 'SELL', 'entry_price': 1.0800, 'stop_loss': 1.0850, 'take_profit': 1.0650, 'lot_size': 0.40}`.\n\n"
             f"The lot size should be calculated for a ${balance} account with a 1-3% risk tolerance per trade/portfolio.\n\n"
             f"Research Consensus:\n{research_consensus}\n\n"
             f"Current Open Positions:\n{open_positions_str}"

@@ -53,12 +53,23 @@ class LiveTrader:
             symbol_with_suffix = base_symbol + symbol_suffix
             timeframes = [mt5.TIMEFRAME_M5, mt5.TIMEFRAME_M15, mt5.TIMEFRAME_H1, mt5.TIMEFRAME_H4, mt5.TIMEFRAME_D1]
 
-            price_data_dict = self.agents['data_analyst'].execute({
-                'source': 'mt5',
-                'symbol': symbol_with_suffix,
-                'timeframes': timeframes,
-                'num_bars': 100
-            })
+            price_data_dict = {}
+            timeframe_bars = {
+                mt5.TIMEFRAME_M5: 100,
+                mt5.TIMEFRAME_M15: 100,
+                mt5.TIMEFRAME_H1: 120,
+                mt5.TIMEFRAME_H4: 120,
+                mt5.TIMEFRAME_D1: 100
+            }
+            for timeframe, num_bars in timeframe_bars.items():
+                data = self.agents['data_analyst'].execute({
+                    'source': 'mt5',
+                    'symbol': symbol_with_suffix,
+                    'timeframes': [timeframe],
+                    'num_bars': num_bars
+                })
+                if data:
+                    price_data_dict.update(data)
 
             if not price_data_dict:
                 print("Could not fetch price data. Retrying in 60 seconds...")
@@ -104,17 +115,61 @@ class LiveTrader:
                         continue
 
                     parsed_data = json.loads(json_match.group(0))
-                    trades_to_execute = []
-
-                    for trade_request in parsed_data.get('trades', []):
-                        # ... (validation and processing logic for each trade)
-                        trades_to_execute.append(trade_request)
-
-                    if trades_to_execute:
-                        self.trade_executor.execute_portfolio(trades_to_execute)
+                    for action in parsed_data.get('actions', []):
+                        action_type = action.get('action')
+                        if action_type == 'new_trade':
+                            # ... (validation and processing logic for new trade)
+                            self.trade_executor.execute_trade(
+                                symbol=action['symbol'],
+                                trade_type=action['trade_type'],
+                                volume=action['volume'],
+                                price=action['price'],
+                                sl=action['sl'],
+                                tp=action['tp'],
+                                comment=action.get('comment', '')
+                            )
+                        elif action_type == 'adjust_trade':
+                            # Placeholder for adjust_trade logic
+                            print(f"Adjust trade action not yet implemented: {action}")
+                        elif action_type == 'close_trade':
+                            self.trade_executor.close_trade(action['trade_id'])
 
                 except Exception as e:
                     print(f"Error during trade execution: {e}")
 
+            self.check_profit_targets()
+            self.check_research_contradiction(research_result['consensus'])
+
             print("\nWaiting for the next trading cycle (5 minutes)...")
             time.sleep(300)
+
+    def check_profit_targets(self):
+        """
+        Checks if any open positions have reached their take profit level.
+        """
+        positions = self.trade_executor.mt5_connection.positions_get()
+        if positions is None:
+            return
+
+        for position in positions:
+            if position.tp > 0:
+                if position.type == mt5.ORDER_TYPE_BUY and position.price_current >= position.tp:
+                    self.trade_executor.close_trade(position.ticket)
+                elif position.type == mt5.ORDER_TYPE_SELL and position.price_current <= position.tp:
+                    self.trade_executor.close_trade(position.ticket)
+
+    def check_research_contradiction(self, research_consensus):
+        """
+        Checks if the research consensus contradicts any open positions.
+        """
+        positions = self.trade_executor.mt5_connection.positions_get()
+        if positions is None:
+            return
+
+        for position in positions:
+            # This is a simplified example. A more sophisticated implementation would
+            # involve a more detailed analysis of the research consensus.
+            if "SELL" in research_consensus and position.type == mt5.ORDER_TYPE_BUY:
+                self.trade_executor.close_trade(position.ticket)
+            elif "BUY" in research_consensus and position.type == mt5.ORDER_TYPE_SELL:
+                self.trade_executor.close_trade(position.ticket)
