@@ -1,0 +1,48 @@
+The author frequently adjusts trades based on a continuous analysis of market performance and currency behaviour, particularly in an intraday context.
+
+Here's how the author approaches trade adjustments and confirms market direction:
+
+### Trade Adjustment Frequency and Triggers
+The author constantly **monitors market conditions** to inform trade adjustments. Adjustments are primarily driven by the ongoing analysis of currency strength and weakness, which is central to their "UFO" system. Specific triggers for adjustment include:
+*   **Deviation from Expected Trend**: If a currency that was expected to go long no longer shows that signal in the daily timeframe, the author may switch or close the order.
+*   **Compensating for Errors**: If the initial entry was too early, too late, or in the wrong direction, the author re-evaluates the analysis and may adjust lot sizes or add extra trades to **recover losses or turn a losing position into a profitable one**.
+*   **Reinforcing Positions**: If the analysis confirms the initial direction despite an initial drawdown, the author may **reinforce the position by splitting lot sizes and adding more trades at specific levels**. This allows them to take profit on a portion of the trade while letting the rest run.
+*   **Changing Market Dynamics**: When currency values or their correlations are "completely changing" during the day, the author makes adjustments to maintain a sharp and effective hedging strategy.
+
+### Confirming Trend Change vs. Retracement or Mean Reversion
+The author distinguishes between a trend change, retracement, or mean reversion through a multi-faceted analytical approach:
+*   **Mathematical Models (UFO/Excel)**: The core of their analysis relies on proprietary mathematical formulas within their "UFO" expert advisor and Excel spreadsheets. These tools measure the strength and weakness, as well as overbought and oversold conditions, of the eight major currencies across multiple timeframes.
+*   **Multi-Timeframe Coherence**: A key aspect is observing whether currency values are **"developing coherently in multiple time frames"** (monthly, weekly, daily, 4-hour, 1-hour, 30-minute, 15-minute).
+    *   **Consistent signals across timeframes** (e.g., a currency being weak in monthly, weekly, and daily views) indicates a stronger, more reliable trend.
+    *   **Contradictory or "unbalancing" values across different timeframes** often signal an uncertain situation, a retracement, or a ranging phase, prompting caution or no trade.
+*   **Oscillator Analysis**: Custom oscillator formulas in Excel are used to detect subtle shifts and confirm the direction of currency movements. Observing these oscillations helps confirm whether a movement is part of a trend or a temporary fluctuation.
+*   **Price Action and Channeling**: The author analyses price action in relation to **calculated support and resistance levels and dynamic channels** derived from historical data (e.g., previous day's highs and lows).
+    *   A price breaking these levels suggests a continuation of the detected direction.
+    *   Observing where the price finds "support" or "resistance" within these channels helps understand its current behaviour.
+*   **Volume Activity**: Tick volume is used to identify periods of increased "activity" at specific price levels. High volume at certain points can confirm selling or buying pressure, aiding in distinguishing between genuine moves and mere noise.
+*   **Fundamental News Awareness**: While the author primarily uses mathematical analysis, they are **aware of major macroeconomic events** (e.g., non-farm payrolls, central bank announcements) to identify periods of high volatility that could lead to unpredictable price spikes or market manipulation. This awareness helps them decide **when to close trades or avoid entering new ones**, rather than trading directly on the news.
+*   **"Zero-Sum Game" Philosophy**: Forex is considered a "zero-sum game" where all currency movements balance out. The goal is to create a portfolio of hedged currency pairs (weak against strong) that collectively yields a positive result, even if individual pairs experience losses or retracements.
+
+### Peak Moments for Opening, Adjusting, and Closing Trades in Intraday Trading
+
+#### Opening Trades:
+The author often opens trades at the following "peak moments":
+*   **Beginning of the Trading Day**: This is a common starting point for analysis and trade placement.
+*   **Start of Major Sessions**: Especially the **London session**, as it's known for higher volatility and activity relevant to certain currency pairs. They also consider overlaps with Asian and American sessions.
+*   **After Confirmation of Values**: They wait for their mathematical analysis (UFO/Excel) to provide clear signals of strong and weak currencies, rather than entering based on price level alone.
+*   **When a Currency Breaks a Key Level**: If a currency shows significant strength or weakness by breaking a predefined level (e.g., above 100 for strength, breaking down from a high point), it's considered an opportune time for entry.
+
+#### Adjusting Trades:
+Adjustments typically occur when:
+*   **Initial Entry Was Suboptimal**: If a trade is entered too early or too late, leading to an immediate drawdown, the author may adjust by adding more trades or modifying lot sizes to compensate and aim for overall profitability.
+*   **Market Values Shift**: If the mathematical analysis reveals that the strength/weakness of currencies is "completely changing" or behaving unexpectedly during the day, adjustments are made to realign the portfolio.
+*   **Dealing with Ranging/Sideways Markets**: In situations where markets are not clearly trending, the author might adjust positions to capture smaller movements or simply manage existing trades more cautiously to avoid prolonged stagnation.
+
+#### Closing Trades:
+The author aims to close trades at strategic times to consolidate profits and minimise risk, especially for intraday positions:
+*   **End of the Trading Day/Session**: Trades are typically closed by the end of the day or the end of a major trading session, particularly the **US session on Fridays**. This avoids holding positions over the weekend when unexpected events can lead to gaps.
+*   **Reaching Sufficient Profit**: The author prioritises "enough profit" rather than waiting for the absolute maximum. They believe in taking profit and getting out of the market to relax and avoid greed.
+*   **Change in Core Analysis**: If the fundamental weak/strong currency relationships identified at the beginning of the day reverse or become unclear, all related trades are closed.
+*   **Risk Threshold**: They utilise a money management expert advisor that automatically closes all trades if the overall portfolio loss reaches a predefined percentage (e.g., 2% or 3%) of the balance. This acts as a disciplined stop-loss for the entire portfolio.
+*   **End of the Month**: Similar to the end of the week, trades are closed at the end of the month to consolidate gains and prepare for new market setups.
+*   **High Volatility Events**: Trades are often closed before major news releases (like non-farm payrolls) to avoid unpredictable and high-impact price movements. They may also step away from the market during "choppy" or unclear periods.

@@ -16,10 +16,17 @@ class DataAnalystAgent(Agent):
             data = {}
             if self.mt5_collector.connect():
                 for timeframe in task['timeframes']:
+                    # Handle different formats of num_bars
+                    if isinstance(task['num_bars'], dict):
+                        num_bars = task['num_bars'].get(timeframe, 100)
+                    else:
+                        num_bars = task['num_bars']
+                    
                     df = self.mt5_collector.get_historical_data(
-                        task['symbol'], timeframe, task['num_bars']
+                        task['symbol'], timeframe, num_bars
                     )
                     data[timeframe] = df
+                    
                 self.mt5_collector.disconnect()
                 return data
             return None

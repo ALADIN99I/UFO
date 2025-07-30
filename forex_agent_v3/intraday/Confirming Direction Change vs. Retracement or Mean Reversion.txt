@@ -1,0 +1,11 @@
+ Confirming Direction Change vs. Retracement or Mean Reversion
+    ◦ The distinction between a temporary retracement and a genuine change in direction is made through a multi-layered analytical process:
+        ▪ Multi-Timeframe Coherence: They analyse currency strength and weakness across multiple timeframes (monthly, weekly, daily, 4-hour, 1-hour, 30-minute, 15-minute). If currency values are "developing coherently in multiple time frames" (e.g., a currency is consistently weak across several long-term and short-term views), it indicates a more reliable trend. Conversely, "contradictory" or "unbalancing" values across different timeframes often signal an uncertain situation, retracement, or ranging phase, prompting caution.
+        ▪ Mathematical Models (UFO/Excel): The core of their system relies on proprietary mathematical formulas within their "UFO" expert advisor and Excel spreadsheets. These tools measure the strength and weakness, as well as overbought and oversold conditions, of the eight major currencies.
+       
+        ▪ Volume Activity: Tick volume is used to identify periods of increased "activity" at specific price levels, which can confirm selling or buying pressure and help distinguish genuine moves from noise.(implment this efficiently if not integrated)
+
+        ▪ "Zero-Sum Game" Philosophy: Forex is viewed as a "zero-sum game" where currency movements balance out. The strategy aims to create a portfolio of hedged currency pairs (weak against strong) that collectively yields a positive result. This means individual trade losses are "covered" and "compensated" by the greater profits from other trades within the hedged portfolio.
+• Loss-to-Profit Outcomes in Practice
+    ◦ Acceptable Losses: While the author states that "it's almost impossible to make a hundred percent sometimes" and acknowledges "little losses" or "negative positions", their aim is that "when something goes wrong it doesn't go wrong that much". Losses are managed to be "reduced to a zero" or a "very small profit".
+    ◦ Overall Portfolio Stop-Loss: Instead of individual stop-losses that could be "caught" by brokers during market oscillations, the author employs an overall portfolio stop-loss, typically set at 2% or 3% of the account balance. This expert advisor automatically closes all trades if the overall portfolio loss reaches this threshold.
